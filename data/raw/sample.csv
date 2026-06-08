@@ -1,0 +1,38 @@
+code,label
+"def add(a, b):
+    return a + b",correct_solution
+"numbers = [1, 2, 3]
+print(sum(numbers))",correct_solution
+"for i in range(10 print(i)",syntax_error
+"def broken(:
+    return 1",syntax_error
+"total = count + 1
+print(total)",variable_misuse
+"name = ""Ada""
+print(nmae)",variable_misuse
+"for i in range(1, 10):
+    print(i)",loop_logic_error
+"i = 0
+while i < 10:
+    print(i)",loop_logic_error
+"if score > 90 and score < 60:
+    print(""pass"")",conditional_logic_error
+"if age < 18:
+    print(""adult"")",conditional_logic_error
+"def add(a, b)
+    return a + b",function_definition_error
+"def square(x):
+    print(x * x)",function_definition_error
+"items = [1, 2, 3]
+print(items[""first""])",data_structure_misuse
+"counts = {}
+counts.append(""a"")",data_structure_misuse
+"for x in items:
+    if x in items:
+        print(x)",algorithmic_inefficiency
+"result = []
+for a in values:
+    for b in values:
+        if a == b:
+            result.append(a)",algorithmic_inefficiency
+

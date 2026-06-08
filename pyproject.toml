@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "programming-error-pattern-recognition"
+version = "0.1.0"
+description = "Pattern recognition project for classifying programming error patterns in student code submissions."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Pattern Recognition Project" }]
+dependencies = [
+  "joblib>=1.3",
+  "pandas>=2.0",
+  "PyYAML>=6.0",
+  "scikit-learn>=1.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
