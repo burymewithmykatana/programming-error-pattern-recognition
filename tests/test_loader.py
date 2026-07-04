@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from error_pattern_recognition.data.schema import DatasetSchema
+from error_pattern_recognition.data.schema import CodeInputSchema
 from error_pattern_recognition.data.splitter import split_dataset
 
 
@@ -23,6 +24,18 @@ def test_dataset_schema_rejects_invalid_label_in_strict_mode() -> None:
     frame = pd.DataFrame({"code": ["print(1)"], "label": ["unknown"]})
     with pytest.raises(ValueError, match="Unsupported labels"):
         DatasetSchema(strict_labels=True).validate_frame(frame)
+
+
+def test_code_input_schema_accepts_unlabeled_code() -> None:
+    frame = pd.DataFrame({"code": ["print(1)"]})
+    validated = CodeInputSchema().validate_frame(frame)
+    assert validated.equals(frame)
+
+
+def test_code_input_schema_requires_code_column() -> None:
+    frame = pd.DataFrame({"source": ["print(1)"]})
+    with pytest.raises(ValueError, match="missing required column"):
+        CodeInputSchema().validate_frame(frame)
 
 
 def test_train_test_split() -> None:

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from error_pattern_recognition.data.schema import DatasetSchema
+from error_pattern_recognition.data.schema import CodeInputSchema, DatasetSchema
 
 
 def load_dataset(path: str | Path, *, strict_labels: bool = True) -> pd.DataFrame:
@@ -14,3 +14,10 @@ def load_dataset(path: str | Path, *, strict_labels: bool = True) -> pd.DataFram
     frame = pd.read_csv(dataset_path)
     return schema.validate_frame(frame)
 
+
+def load_code_input(path: str | Path) -> pd.DataFrame:
+    """Load and validate a code-only prediction CSV."""
+    schema = CodeInputSchema()
+    input_path = schema.validate_path(path)
+    frame = pd.read_csv(input_path)
+    return schema.validate_frame(frame)

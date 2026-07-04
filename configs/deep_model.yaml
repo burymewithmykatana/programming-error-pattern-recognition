@@ -7,5 +7,4 @@ training:
   epochs: 3
   batch_size: 8
   learning_rate: 0.00002
-notes: "Placeholder config for future Hugging Face transformer fine-tuning."
-
+notes: "Configuration for optional Hugging Face transformer fine-tuning."

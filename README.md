@@ -30,9 +30,15 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+Transformer training is optional and requires additional dependencies:
+
+```bash
+pip install -e .[transformer]
+```
+
 ## Dataset Format
 
-The expected dataset is a CSV file with two columns:
+Training and evaluation datasets are CSV files with two columns:
 
 ```csv
 code,label
@@ -40,18 +46,19 @@ code,label
 "for i in range(10 print(i)","syntax_error"
 ```
 
-A small synthetic sample is provided at `data/raw/sample.csv`.
+A small demo sample is provided at `data/raw/sample.csv`. A larger generated training dataset
+with 1,000 balanced examples is available at `data/raw/curated_python_errors.csv`.
 
 ## Training
 
 ```bash
-python scripts/train_baseline.py --data data/raw/sample.csv --config configs/baseline.yaml --output models/baseline_svm.joblib
+python scripts/train_baseline.py --data data/raw/curated_python_errors.csv --config configs/baseline.yaml --output models/baseline_svm.joblib
 ```
 
 ## Evaluation
 
 ```bash
-python scripts/evaluate.py --data data/raw/sample.csv --model models/baseline_svm.joblib --output reports/baseline_eval
+python scripts/evaluate.py --data data/raw/curated_python_errors.csv --model models/baseline_svm.joblib --output reports/baseline_holdout_eval --config configs/baseline.yaml --holdout
 ```
 
 Evaluation writes:
@@ -71,8 +78,10 @@ python scripts/predict.py --model models/baseline_svm.joblib --code "for i in ra
 Batch prediction:
 
 ```bash
-python scripts/predict.py --model models/baseline_svm.joblib --input data/raw/sample.csv --output reports/predictions.csv
+python scripts/predict.py --model models/baseline_svm.joblib --input data/raw/unlabeled.csv --output reports/predictions.csv
 ```
+
+Batch prediction input only needs a `code` column. If a `label` column is present, it is preserved in the output alongside `predicted_label`.
 
 ## Project Structure
 
