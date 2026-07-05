@@ -30,6 +30,14 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+Prepare Python training data from DeepMind CodeContests with its cache on drive D:
+
+```bash
+pip install -e .[datasets]
+python scripts/prepare_code_contests.py --cache-dir D:\huggingface\code_contests
+python scripts/train_baseline.py --data data/processed/code_contests_python.csv --config configs/baseline.yaml --output models/code_contests_svm.joblib
+```
+
 ## Dataset Format
 
 The expected dataset is a CSV file with two columns:
