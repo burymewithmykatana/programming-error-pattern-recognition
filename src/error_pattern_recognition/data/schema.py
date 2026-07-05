@@ -47,3 +47,28 @@ class DatasetSchema:
 
         return frame
 
+
+@dataclass(frozen=True)
+class CodeInputSchema:
+    """Validation settings for unlabeled code input data."""
+
+    code_column: str = "code"
+
+    def validate_path(self, path: str | Path) -> Path:
+        """Validate that an input CSV path exists."""
+        input_path = Path(path)
+        if not input_path.exists():
+            raise FileNotFoundError(f"Input CSV not found: {input_path}")
+        if not input_path.is_file():
+            raise ValueError(f"Input path is not a file: {input_path}")
+        return input_path
+
+    def validate_frame(self, frame: pd.DataFrame) -> pd.DataFrame:
+        """Validate code-only prediction input."""
+        if self.code_column not in frame.columns:
+            raise ValueError(f"Input CSV is missing required column: {self.code_column}")
+        if frame[self.code_column].isna().any():
+            raise ValueError("Input CSV contains missing code values.")
+        if not frame[self.code_column].map(lambda value: isinstance(value, str)).all():
+            raise ValueError("All code values must be strings.")
+        return frame

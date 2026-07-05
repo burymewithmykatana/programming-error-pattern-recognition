@@ -1,4 +1,4 @@
-"""CLI placeholder for future transformer training."""
+"""CLI wrapper for transformer training."""
 
 from __future__ import annotations
 
@@ -14,15 +14,15 @@ from error_pattern_recognition.training.train_transformer import train_transform
 
 def parse_args() -> argparse.Namespace:
     """Parse CLI arguments."""
-    parser = argparse.ArgumentParser(description="Train a future transformer classifier.")
-    parser.add_argument("--data", required=True, type=Path)
-    parser.add_argument("--config", required=True, type=Path)
-    parser.add_argument("--output", required=True, type=Path)
+    parser = argparse.ArgumentParser(description="Train a transformer classifier.")
+    parser.add_argument("--data", required=True, type=Path, help="Path to labeled CSV data.")
+    parser.add_argument("--config", required=True, type=Path, help="Path to YAML config.")
+    parser.add_argument("--output", required=True, type=Path, help="Output model artifact directory.")
     return parser.parse_args()
 
 
 def main() -> None:
-    """Run transformer training placeholder."""
+    """Run transformer training."""
     args = parse_args()
     train_transformer(args.data, load_config(args.config), args.output)
 

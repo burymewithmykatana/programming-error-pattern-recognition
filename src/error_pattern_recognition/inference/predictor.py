@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from error_pattern_recognition.data.loader import load_dataset
+from error_pattern_recognition.data.loader import load_code_input
 from error_pattern_recognition.models.baseline_svm import BaselineTextClassifier
 
 
@@ -29,7 +29,7 @@ class Predictor:
 
     def predict_csv(self, input_path: str | Path, output_path: str | Path | None = None) -> pd.DataFrame:
         """Predict labels for a CSV file containing a code column."""
-        frame = load_dataset(input_path, strict_labels=False)
+        frame = load_code_input(input_path)
         predictions = self.predict_many(frame["code"].astype(str).tolist())
         result = frame.copy()
         result["predicted_label"] = predictions
@@ -38,4 +38,3 @@ class Predictor:
             output.parent.mkdir(parents=True, exist_ok=True)
             result.to_csv(output, index=False)
         return result
-

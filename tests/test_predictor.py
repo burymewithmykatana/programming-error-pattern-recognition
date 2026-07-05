@@ -30,3 +30,24 @@ def test_predictor_loading_behavior(tmp_path: Path) -> None:
     predictor = Predictor.from_model_path(artifact)
     assert predictor.predict_one("print(2)") in {"correct_solution", "syntax_error"}
 
+
+def test_predictor_batch_prediction_accepts_unlabeled_csv(tmp_path: Path) -> None:
+    config = {
+        "preprocessing": {"normalize_identifiers": False, "normalize_numbers": False},
+        "tfidf": {"lowercase": False, "ngram_range": [1, 1], "min_df": 1},
+        "classifier": {"name": "linear_svc", "C": 1.0},
+    }
+    model = BaselineTextClassifier.from_config(config)
+    model.fit(
+        ["print(1)", "for i in range(10 print(i)"],
+        ["correct_solution", "syntax_error"],
+    )
+    artifact = tmp_path / "model.joblib"
+    model.save(artifact)
+    input_csv = tmp_path / "input.csv"
+    input_csv.write_text("code\nprint(2)\n", encoding="utf-8")
+
+    result = Predictor.from_model_path(artifact).predict_csv(input_csv)
+
+    assert list(result.columns) == ["code", "predicted_label"]
+    assert result.loc[0, "predicted_label"] in {"correct_solution", "syntax_error"}
