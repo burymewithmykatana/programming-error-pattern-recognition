@@ -7,4 +7,8 @@ training:
   epochs: 3
   batch_size: 8
   learning_rate: 0.00002
+  gradient_accumulation_steps: 2
+  validation_size: 0.1
+  early_stopping_patience: 2
+  mixed_precision: true
 notes: "Configuration for optional Hugging Face transformer fine-tuning."

@@ -1,108 +1,98 @@
 # Final Report
 
-## Project Overview
+## Research Question
 
-This project studies automatic recognition of programming error patterns in Python student submissions. The task is formulated as supervised multi-class classification: each code snippet is assigned exactly one error-pattern label.
+Can source-code representations recognize recurring programming-error patterns, and how well
+does a prototype trained on generated labels transfer to a real submission corpus?
 
-The implemented pipeline covers dataset validation, preprocessing, TF-IDF feature extraction, baseline model training, evaluation, prediction, and an optional transformer extension path.
+## Experimental Design
 
-## Labels
+The project reports two deliberately separate tasks:
 
-The project supports eight labels:
+1. An eight-class prototype using 976 unique generated Python snippets.
+2. A binary external validation using real Python submissions from DeepMind CodeContests.
 
-- `correct_solution`
-- `syntax_error`
-- `variable_misuse`
-- `loop_logic_error`
-- `conditional_logic_error`
-- `function_definition_error`
-- `data_structure_misuse`
-- `algorithmic_inefficiency`
+The synthetic labels are `correct_solution`, `syntax_error`, `variable_misuse`,
+`loop_logic_error`, `conditional_logic_error`, `function_definition_error`,
+`data_structure_misuse`, and `algorithmic_inefficiency`.
 
-## Dataset
+CodeContests does not identify semantic error categories. Its accepted Python solutions are
+therefore labeled `correct_solution`; only incorrect submissions that fail Python AST parsing
+are labeled `syntax_error`. Parseable incorrect submissions are excluded rather than assigned
+unsupported semantic labels.
 
-The training dataset is `data/raw/curated_python_errors.csv`. It contains 1,000 generated Python examples, balanced across the eight labels with 125 examples per class.
+## Leakage Controls
 
-This dataset is useful for reproducible experimentation and validating the full pattern-recognition pipeline. Because it is generated rather than collected from real course submissions, the reported metrics should be interpreted as prototype results, not as evidence of real classroom performance.
+- Exact code is normalized for line endings and surrounding whitespace, then SHA-256 hashed.
+- Duplicates within each split are removed.
+- A run fails if any fingerprint occurs in both train and test.
+- CodeContests uses its official train and test problem splits.
+- The synthetic dataset uses a deterministic stratified 75/25 split after deduplication.
 
-## Method
+## Models
 
-The primary implemented model is a classical text baseline:
+### TF-IDF + Linear SVM
 
-1. Normalize Python code with the preprocessing pipeline.
-2. Convert normalized code tokens into TF-IDF features.
-3. Train a linear SVM classifier.
-4. Evaluate on the held-out split defined by `configs/baseline.yaml`.
+The local baseline normalizes code tokens, extracts unigram and bigram TF-IDF features, and
+trains a `LinearSVC`.
 
-The baseline configuration uses:
+### CodeBERT
 
-- Train/test split: 75% / 25%
-- Random seed: 42
-- Identifier normalization: enabled
-- Number normalization: enabled
-- TF-IDF n-grams: 1 to 2
-- Classifier: LinearSVC
+The project includes a Hugging Face training path and a Colab notebook for
+`microsoft/codebert-base`. It uses a maximum length of 256, batch size 8, gradient
+accumulation, mixed precision when CUDA is available, early stopping, and seed 42.
+CodeBERT metrics are not claimed until the Colab experiments have completed.
 
-## Results
+## Measured SVM Results
 
-The trained baseline model was evaluated on the held-out 250-example split.
+| Dataset | Classes | Train | Test | Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| Synthetic prototype | 8 | 732 | 244 | 0.8975 | 0.9031 | 0.9005 |
+| CodeContests external validation | 2 | 19,999 | 2,059 | 0.7047 | 0.4404 | 0.8029 |
 
-| Metric | Value |
-|---|---:|
-| Accuracy | 0.892 |
-| Macro precision | 0.905 |
-| Macro recall | 0.891 |
-| Macro F1 | 0.895 |
-| Weighted F1 | 0.896 |
+The synthetic experiment performs strongly on categories with visually distinct templates.
+Most errors occur between correct code, variable misuse, and loop-logic mistakes.
 
-Per-class performance was strongest for `syntax_error`, `conditional_logic_error`, `function_definition_error`, `data_structure_misuse`, and `algorithmic_inefficiency`, each reaching perfect held-out F1 on this generated dataset.
+The CodeContests test split is naturally imbalanced: 2,000 correct submissions and 59 syntax
+errors. The model correctly identifies 1,433 correct submissions and 18 syntax errors. Its
+syntax-error precision is 0.03 and recall is 0.31, so the 0.70 accuracy must not be interpreted
+as strong minority-class performance. Macro F1 is the more informative summary.
 
-The main confusion occurred among:
+## Reproduction
 
-- `correct_solution`
-- `variable_misuse`
-- `loop_logic_error`
+```powershell
+python scripts/split_dataset.py --data data/raw/curated_python_errors.csv `
+  --train-output data/processed/synthetic/train.csv `
+  --test-output data/processed/synthetic/test.csv
 
-This is expected because the generated examples for these classes share similar token patterns and differ more by semantic behavior than by obvious lexical structure.
+python scripts/run_experiment.py `
+  --train-data data/processed/synthetic/train.csv `
+  --test-data data/processed/synthetic/test.csv `
+  --model-type svm --config configs/baseline.yaml `
+  --output reports/experiments/synthetic_svm
 
-## Reproducibility
-
-Generate the dataset:
-
-```bash
-python scripts/generate_curated_dataset.py --output data/raw/curated_python_errors.csv --examples-per-label 125
+python scripts/run_experiment.py `
+  --train-data data/processed/code_contests/train.csv `
+  --test-data data/processed/code_contests/test.csv `
+  --model-type svm --config configs/baseline.yaml `
+  --output reports/experiments/codecontests_svm
 ```
 
-Train the baseline:
-
-```bash
-python scripts/train_baseline.py --data data/raw/curated_python_errors.csv --config configs/baseline.yaml --output models/baseline_svm.joblib
-```
-
-Evaluate on the held-out split:
-
-```bash
-python scripts/evaluate.py --data data/raw/curated_python_errors.csv --model models/baseline_svm.joblib --output reports/baseline_holdout_eval --config configs/baseline.yaml --holdout
-```
-
-## Transformer Extension
-
-The project includes an optional Hugging Face transformer path for CodeBERT-style sequence classification. It supports configuration parsing, label mapping, model training, artifact saving, artifact loading, and inference. Transformer dependencies are optional and can be installed with:
-
-```bash
-pip install -e .[transformer]
-```
-
-The transformer path is prepared for deeper experimentation, but the baseline SVM remains the primary reproducible result for this report.
+Run `notebooks/02_codebert_colab.ipynb` in Google Colab for the two CodeBERT experiments.
 
 ## Limitations
 
-- The dataset is generated, not collected from real student submissions.
-- Each snippet has exactly one label, while real submissions may contain multiple errors.
-- Some labels require semantic reasoning that TF-IDF features only approximate.
-- Evaluation on real course data may be substantially lower than the generated-dataset result.
-- The current dashboard and multi-user workflow are not implemented yet.
+- The eight-class corpus is generated and does not establish classroom generalization.
+- CodeContests is competitive-programming data, not an introductory classroom dataset.
+- Real semantic error labels are unavailable.
+- The real binary test set is strongly imbalanced.
+- A submission can contain multiple errors, while the current formulation is single-label.
+- Model predictions should support instructor review, not replace it.
 
 ## Conclusion
 
-The project now provides a complete pattern-recognition pipeline for Python programming error classification. The TF-IDF plus LinearSVC baseline reaches 0.895 macro F1 on the held-out generated dataset, demonstrating that the implemented pipeline is functional and reproducible. The next major step is validating the approach on real anonymized student submissions and adding a dashboard for instructor-facing analysis.
+The project now provides a reproducible end-to-end system covering data preparation, leakage
+checks, training, evaluation, saved artifacts, inference, and an instructor-facing demo.
+Synthetic results show that the pipeline can learn the proposed taxonomy. Real-data results
+show a substantially harder and more imbalanced problem, establishing an honest boundary for
+the current claims. The next research step is expert annotation of real student submissions.

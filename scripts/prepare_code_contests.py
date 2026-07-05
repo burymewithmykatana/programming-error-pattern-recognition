@@ -5,12 +5,19 @@ from __future__ import annotations
 import argparse
 import ast
 import csv
+import hashlib
 import os
 import warnings
 from pathlib import Path
 from typing import Any, Iterable
 
 PYTHON_LANGUAGE_IDS = {1, 3}
+
+
+def code_fingerprint(code: str) -> str:
+    """Fingerprint code after normalizing line endings and outer whitespace."""
+    normalized = code.replace("\r\n", "\n").strip()
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
 def classify_incorrect(code: str) -> str | None:
@@ -29,12 +36,14 @@ def iter_labeled_rows(
     *,
     max_correct: int,
     max_syntax_errors: int,
+    source_split: str = "train",
 ) -> Iterable[dict[str, str]]:
     """Yield balanced, deduplicated Python rows."""
     counts = {"correct_solution": 0, "syntax_error": 0}
     seen: set[str] = set()
 
     for record in records:
+        problem_id = str(record.get("name") or "")
         solutions = record.get("solutions") or {}
         for language, code in zip(
             solutions.get("language", []),
@@ -44,12 +53,17 @@ def iter_labeled_rows(
             if (
                 language in PYTHON_LANGUAGE_IDS
                 and code
-                and code not in seen
+                and code_fingerprint(code) not in seen
                 and counts["correct_solution"] < max_correct
             ):
-                seen.add(code)
+                seen.add(code_fingerprint(code))
                 counts["correct_solution"] += 1
-                yield {"code": code, "label": "correct_solution"}
+                yield {
+                    "code": code,
+                    "label": "correct_solution",
+                    "problem_id": problem_id,
+                    "source_split": source_split,
+                }
 
         incorrect = record.get("incorrect_solutions") or {}
         for language, code in zip(
@@ -60,15 +74,20 @@ def iter_labeled_rows(
             if (
                 language not in PYTHON_LANGUAGE_IDS
                 or not code
-                or code in seen
+                or code_fingerprint(code) in seen
                 or counts["syntax_error"] >= max_syntax_errors
             ):
                 continue
             label = classify_incorrect(code)
             if label is not None:
-                seen.add(code)
+                seen.add(code_fingerprint(code))
                 counts[label] += 1
-                yield {"code": code, "label": label}
+                yield {
+                    "code": code,
+                    "label": label,
+                    "problem_id": problem_id,
+                    "source_split": source_split,
+                }
 
         if counts["correct_solution"] >= max_correct and counts["syntax_error"] >= max_syntax_errors:
             return
@@ -101,10 +120,14 @@ def prepare_dataset(
         records,
         max_correct=examples_per_label,
         max_syntax_errors=examples_per_label,
+        source_split=split,
     )
     counts = {"correct_solution": 0, "syntax_error": 0}
     with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["code", "label"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=["code", "label", "problem_id", "source_split"],
+        )
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
@@ -118,17 +141,23 @@ def prepare_dataset(
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path)
     parser.add_argument(
-        "--output",
+        "--output-dir",
         type=Path,
-        default=Path("data/processed/code_contests_python.csv"),
+        default=Path("data/processed/code_contests"),
     )
     parser.add_argument(
         "--cache-dir",
         type=Path,
         default=Path(r"D:\huggingface\code_contests"),
     )
-    parser.add_argument("--split", default="train")
+    parser.add_argument("--split", choices=("train", "valid", "test"))
+    parser.add_argument(
+        "--splits",
+        default="train,valid,test",
+        help="Comma-separated official splits used when --split is omitted.",
+    )
     parser.add_argument("--examples-per-label", type=int, default=10_000)
     parser.add_argument(
         "--download",
@@ -141,14 +170,21 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     """Prepare the dataset."""
     args = parse_args()
-    counts = prepare_dataset(
-        output_path=args.output,
-        cache_dir=args.cache_dir,
-        split=args.split,
-        examples_per_label=args.examples_per_label,
-        streaming=not args.download,
-    )
-    print(f"Wrote {sum(counts.values())} rows to {args.output}: {counts}")
+    splits = [args.split] if args.split else [item.strip() for item in args.splits.split(",")]
+    for split in splits:
+        if split not in {"train", "valid", "test"}:
+            raise ValueError(f"Unsupported CodeContests split: {split}")
+        output_path = args.output if len(splits) == 1 and args.output else (
+            args.output_dir / f"{split}.csv"
+        )
+        counts = prepare_dataset(
+            output_path=output_path,
+            cache_dir=args.cache_dir,
+            split=split,
+            examples_per_label=args.examples_per_label,
+            streaming=not args.download,
+        )
+        print(f"Wrote {sum(counts.values())} rows to {output_path}: {counts}")
 
 
 if __name__ == "__main__":

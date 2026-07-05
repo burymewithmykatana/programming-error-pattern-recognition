@@ -1,0 +1,61 @@
+{
+  "model_type": "svm",
+  "train_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\synthetic\\train.csv",
+  "test_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\synthetic\\test.csv",
+  "model_path": "C:\\Users\\S.R.G\\Documents\\PR project\\reports\\experiments\\synthetic_svm\\model.joblib",
+  "labels": [
+    "algorithmic_inefficiency",
+    "conditional_logic_error",
+    "correct_solution",
+    "data_structure_misuse",
+    "function_definition_error",
+    "loop_logic_error",
+    "syntax_error",
+    "variable_misuse"
+  ],
+  "config": {
+    "random_seed": 42,
+    "test_size": 0.25,
+    "strict_labels": true,
+    "preprocessing": {
+      "remove_inline_comments": true,
+      "normalize_identifiers": true,
+      "normalize_numbers": true
+    },
+    "tfidf": {
+      "lowercase": false,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "min_df": 1
+    },
+    "classifier": {
+      "name": "linear_svc",
+      "C": 1.0
+    }
+  },
+  "python": "3.14.3",
+  "dataset_stats": {
+    "train_labels": {
+      "algorithmic_inefficiency": 94,
+      "loop_logic_error": 94,
+      "function_definition_error": 94,
+      "correct_solution": 94,
+      "conditional_logic_error": 94,
+      "data_structure_misuse": 93,
+      "variable_misuse": 93,
+      "syntax_error": 76
+    },
+    "test_labels": {
+      "data_structure_misuse": 32,
+      "variable_misuse": 32,
+      "conditional_logic_error": 31,
+      "algorithmic_inefficiency": 31,
+      "loop_logic_error": 31,
+      "function_definition_error": 31,
+      "correct_solution": 31,
+      "syntax_error": 25
+    }
+  }
+}

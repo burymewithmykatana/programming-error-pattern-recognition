@@ -221,5 +221,8 @@ __marimo__/
 models/*.joblib
 reports/*_eval/
 reports/predictions.csv
+reports/experiments/*/model.joblib
+reports/experiments/*/model/
+reports/experiments/*/predictions.csv
 data/processed/*
 !data/processed/.gitkeep

@@ -27,6 +27,11 @@ class TransformerClassifierConfig:
     epochs: int = 3
     batch_size: int = 8
     learning_rate: float = 2e-5
+    gradient_accumulation_steps: int = 2
+    validation_size: float = 0.1
+    early_stopping_patience: int = 2
+    mixed_precision: bool = True
+    random_seed: int = 42
 
     @classmethod
     def from_config(cls, config: dict[str, Any]) -> "TransformerClassifierConfig":
@@ -40,6 +45,25 @@ class TransformerClassifierConfig:
             epochs=int(training_config.get("epochs", cls.epochs)),
             batch_size=int(training_config.get("batch_size", cls.batch_size)),
             learning_rate=float(training_config.get("learning_rate", cls.learning_rate)),
+            gradient_accumulation_steps=int(
+                training_config.get(
+                    "gradient_accumulation_steps",
+                    cls.gradient_accumulation_steps,
+                )
+            ),
+            validation_size=float(
+                training_config.get("validation_size", cls.validation_size)
+            ),
+            early_stopping_patience=int(
+                training_config.get(
+                    "early_stopping_patience",
+                    cls.early_stopping_patience,
+                )
+            ),
+            mixed_precision=bool(
+                training_config.get("mixed_precision", cls.mixed_precision)
+            ),
+            random_seed=int(config.get("random_seed", cls.random_seed)),
         ).validate()
 
     def validate(self) -> "TransformerClassifierConfig":
@@ -56,6 +80,12 @@ class TransformerClassifierConfig:
             raise ValueError("Transformer batch_size must be positive.")
         if self.learning_rate <= 0:
             raise ValueError("Transformer learning_rate must be positive.")
+        if self.gradient_accumulation_steps <= 0:
+            raise ValueError("gradient_accumulation_steps must be positive.")
+        if not 0 < self.validation_size < 0.5:
+            raise ValueError("validation_size must be between zero and 0.5.")
+        if self.early_stopping_patience <= 0:
+            raise ValueError("early_stopping_patience must be positive.")
         return self
 
 
@@ -112,6 +142,18 @@ class TransformerCodeClassifier:
         self.label_to_id = build_label_mapping(labels)
         self.id_to_label = {identifier: label for label, identifier in self.label_to_id.items()}
         encoded_labels = [self.label_to_id[label] for label in labels]
+        from sklearn.model_selection import train_test_split
+
+        stratify = encoded_labels if min(
+            encoded_labels.count(identifier) for identifier in set(encoded_labels)
+        ) >= 2 else None
+        train_code, validation_code, train_labels, validation_labels = train_test_split(
+            code_snippets,
+            encoded_labels,
+            test_size=self.config.validation_size,
+            random_state=self.config.random_seed,
+            stratify=stratify,
+        )
 
         tokenizer = transformers.AutoTokenizer.from_pretrained(self.config.model_name)
         model = transformers.AutoModelForSequenceClassification.from_pretrained(
@@ -122,8 +164,15 @@ class TransformerCodeClassifier:
         )
         train_dataset = _TokenizedCodeDataset(
             tokenizer=tokenizer,
-            code_snippets=code_snippets,
-            labels=encoded_labels,
+            code_snippets=train_code,
+            labels=train_labels,
+            max_length=self.config.max_length,
+            torch_module=torch,
+        )
+        validation_dataset = _TokenizedCodeDataset(
+            tokenizer=tokenizer,
+            code_snippets=validation_code,
+            labels=validation_labels,
             max_length=self.config.max_length,
             torch_module=torch,
         )
@@ -134,15 +183,29 @@ class TransformerCodeClassifier:
             output_dir=str(artifact_path),
             num_train_epochs=self.config.epochs,
             per_device_train_batch_size=self.config.batch_size,
+            per_device_eval_batch_size=self.config.batch_size,
+            gradient_accumulation_steps=self.config.gradient_accumulation_steps,
             learning_rate=self.config.learning_rate,
             save_strategy="epoch",
+            eval_strategy="epoch",
+            load_best_model_at_end=True,
+            metric_for_best_model="eval_loss",
+            greater_is_better=False,
+            fp16=self.config.mixed_precision and bool(torch.cuda.is_available()),
+            seed=self.config.random_seed,
             report_to=[],
         )
         trainer = transformers.Trainer(
             model=model,
             args=training_args,
             train_dataset=train_dataset,
+            eval_dataset=validation_dataset,
             tokenizer=tokenizer,
+            callbacks=[
+                transformers.EarlyStoppingCallback(
+                    early_stopping_patience=self.config.early_stopping_patience
+                )
+            ],
         )
         trainer.train()
         trainer.save_model(str(artifact_path))

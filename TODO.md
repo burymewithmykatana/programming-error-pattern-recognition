@@ -9,4 +9,6 @@
 7. Done: Review and complete the exploratory notebook and final report.
 8. Done: Add CLI-level tests for training, prediction, and evaluation scripts.
 9. Stage and commit the current project changes when ready.
-10. Implement a UI dashboard for instructors to upload submissions, run predictions, and inspect error-pattern reports.
+10. Done: Implement a UI dashboard for instructors to upload submissions, run predictions, and inspect error-pattern reports.
+11. Run both CodeBERT experiments in Google Colab and copy their measured artifacts back.
+12. Insert measured CodeBERT metrics into the final report and regenerate the presentation.

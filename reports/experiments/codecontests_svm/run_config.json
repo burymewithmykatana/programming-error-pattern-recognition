@@ -1,0 +1,43 @@
+{
+  "model_type": "svm",
+  "train_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\code_contests\\train.csv",
+  "test_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\code_contests\\test.csv",
+  "model_path": "C:\\Users\\S.R.G\\Documents\\PR project\\reports\\experiments\\codenet_svm\\model.joblib",
+  "labels": [
+    "correct_solution",
+    "syntax_error"
+  ],
+  "config": {
+    "random_seed": 42,
+    "test_size": 0.25,
+    "strict_labels": true,
+    "preprocessing": {
+      "remove_inline_comments": true,
+      "normalize_identifiers": true,
+      "normalize_numbers": true
+    },
+    "tfidf": {
+      "lowercase": false,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "min_df": 1
+    },
+    "classifier": {
+      "name": "linear_svc",
+      "C": 1.0
+    }
+  },
+  "python": "3.14.3",
+  "dataset_stats": {
+    "train_labels": {
+      "correct_solution": 10000,
+      "syntax_error": 9999
+    },
+    "test_labels": {
+      "correct_solution": 2000,
+      "syntax_error": 59
+    }
+  }
+}

@@ -1,0 +1,14 @@
+                           precision    recall  f1-score   support
+
+         correct_solution       0.58      0.68      0.63        31
+             syntax_error       1.00      1.00      1.00        25
+          variable_misuse       0.71      0.78      0.75        32
+         loop_logic_error       1.00      0.74      0.85        31
+  conditional_logic_error       1.00      1.00      1.00        31
+function_definition_error       1.00      1.00      1.00        31
+    data_structure_misuse       1.00      1.00      1.00        32
+ algorithmic_inefficiency       1.00      1.00      1.00        31
+
+                 accuracy                           0.90       244
+                macro avg       0.91      0.90      0.90       244
+             weighted avg       0.91      0.90      0.90       244

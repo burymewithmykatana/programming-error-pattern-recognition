@@ -1,6 +1,6 @@
 # Deep Learning-Based Recognition of Programming Error Patterns in Student Code Submissions
 
-This repository contains a modular Pattern Recognition course project for classifying student programming submissions into common programming error categories. The first MVP targets Python code and provides a fully working classical machine learning baseline, with a clean extension point for future CodeBERT-style transformer fine-tuning.
+This repository contains a modular Pattern Recognition course project for classifying student programming submissions into common programming error categories. The project targets Python code and provides a classical TF-IDF/SVM baseline, CodeBERT training and inference, leakage-safe experiments, and a Streamlit demonstration dashboard.
 
 ## Research Motivation
 
@@ -35,7 +35,7 @@ Prepare Python training data from DeepMind CodeContests with its cache on drive 
 ```bash
 pip install -e .[datasets]
 python scripts/prepare_code_contests.py --cache-dir D:\huggingface\code_contests
-python scripts/train_baseline.py --data data/processed/code_contests_python.csv --config configs/baseline.yaml --output models/code_contests_svm.joblib
+python scripts/sanitize_splits.py --train data/processed/code_contests/train.csv --validation data/processed/code_contests/valid.csv --test data/processed/code_contests/test.csv --output-dir data/processed/code_contests
 ```
 
 Transformer training is optional and requires additional dependencies:
@@ -62,6 +62,15 @@ with 1,000 balanced examples is available at `data/raw/curated_python_errors.csv
 ```bash
 python scripts/train_baseline.py --data data/raw/curated_python_errors.csv --config configs/baseline.yaml --output models/baseline_svm.joblib
 ```
+
+Run an explicit leakage-safe train/test experiment:
+
+```bash
+python scripts/run_experiment.py --train-data data/processed/synthetic/train.csv --test-data data/processed/synthetic/test.csv --model-type svm --config configs/baseline.yaml --output reports/experiments/synthetic_svm
+```
+
+The experiment directory contains metrics, a classification report, a confusion matrix,
+predictions, run metadata, timings, dataset statistics, and the trained artifact.
 
 ## Evaluation
 
@@ -112,12 +121,23 @@ tests/                    Pytest suite
 
 ## Relation to Pattern Recognition
 
-The system follows a standard pattern recognition pipeline: input representation, preprocessing, feature extraction, supervised model training, evaluation, and inference. The baseline uses TF-IDF features over normalized code tokens and a linear classifier, while the future deep learning path will learn contextual code representations with transformer encoders.
+The system follows a standard pattern recognition pipeline: input representation, preprocessing, feature extraction, supervised model training, evaluation, and inference. The baseline uses TF-IDF features over normalized code tokens and a linear classifier, while CodeBERT learns contextual code representations with a transformer encoder.
 
 ## Future Work
 
 - Add larger real-world datasets from course submissions.
-- Fine-tune `microsoft/codebert-base` for sequence classification.
+- Complete and report the two Colab CodeBERT runs.
 - Add task-aware evaluation using hidden unit tests.
 - Support multi-label classification when submissions contain multiple errors.
-- Build instructor dashboards and feedback generation.
+- Extend the dashboard with instructor feedback generation.
+
+## Dashboard and presentation
+
+```bash
+pip install -e .[presentation]
+streamlit run app.py
+python scripts/generate_presentation.py
+```
+
+Presentation deliverables are under `presentation/`. Run
+`notebooks/02_codebert_colab.ipynb` on a Colab GPU to produce the two CodeBERT experiments.

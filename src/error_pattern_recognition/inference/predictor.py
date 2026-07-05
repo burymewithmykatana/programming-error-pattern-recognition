@@ -6,18 +6,22 @@ import pandas as pd
 
 from error_pattern_recognition.data.loader import load_code_input
 from error_pattern_recognition.models.baseline_svm import BaselineTextClassifier
+from error_pattern_recognition.models.transformer_classifier import TransformerCodeClassifier
 
 
 class Predictor:
     """Load a saved model and run one-off or batch predictions."""
 
-    def __init__(self, model: BaselineTextClassifier) -> None:
+    def __init__(self, model: BaselineTextClassifier | TransformerCodeClassifier) -> None:
         self.model = model
 
     @classmethod
     def from_model_path(cls, path: str | Path) -> "Predictor":
         """Create a predictor from a saved model path."""
-        return cls(BaselineTextClassifier.load(path))
+        model_path = Path(path)
+        if model_path.is_dir():
+            return cls(TransformerCodeClassifier.load(model_path))
+        return cls(BaselineTextClassifier.load(model_path))
 
     def predict_one(self, code: str) -> str:
         """Predict one code snippet."""

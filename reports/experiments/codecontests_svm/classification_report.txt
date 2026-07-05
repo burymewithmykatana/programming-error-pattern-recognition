@@ -1,0 +1,8 @@
+                  precision    recall  f1-score   support
+
+correct_solution       0.97      0.72      0.82      2000
+    syntax_error       0.03      0.31      0.06        59
+
+        accuracy                           0.70      2059
+       macro avg       0.50      0.51      0.44      2059
+    weighted avg       0.95      0.70      0.80      2059
