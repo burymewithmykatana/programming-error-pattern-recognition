@@ -1,0 +1,14 @@
+random_seed: 42
+model:
+  name: hf-internal-testing/tiny-random-roberta
+  max_length: 64
+  num_labels: 8
+training:
+  epochs: 1
+  batch_size: 2
+  learning_rate: 0.00005
+  gradient_accumulation_steps: 1
+  validation_size: 0.25
+  early_stopping_patience: 1
+  mixed_precision: false
+notes: "Tiny transformer config for local pipeline smoke tests, not for reported metrics."

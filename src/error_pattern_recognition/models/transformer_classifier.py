@@ -161,6 +161,7 @@ class TransformerCodeClassifier:
             num_labels=len(self.label_to_id),
             id2label={str(identifier): label for identifier, label in self.id_to_label.items()},
             label2id=self.label_to_id,
+            ignore_mismatched_sizes=True,
         )
         train_dataset = _TokenizedCodeDataset(
             tokenizer=tokenizer,
@@ -195,18 +196,25 @@ class TransformerCodeClassifier:
             seed=self.config.random_seed,
             report_to=[],
         )
-        trainer = transformers.Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=train_dataset,
-            eval_dataset=validation_dataset,
-            tokenizer=tokenizer,
-            callbacks=[
+        trainer_kwargs = {
+            "model": model,
+            "args": training_args,
+            "train_dataset": train_dataset,
+            "eval_dataset": validation_dataset,
+            "callbacks": [
                 transformers.EarlyStoppingCallback(
                     early_stopping_patience=self.config.early_stopping_patience
                 )
             ],
-        )
+        }
+        import inspect
+
+        trainer_signature = inspect.signature(transformers.Trainer.__init__)
+        if "processing_class" in trainer_signature.parameters:
+            trainer_kwargs["processing_class"] = tokenizer
+        else:
+            trainer_kwargs["tokenizer"] = tokenizer
+        trainer = transformers.Trainer(**trainer_kwargs)
         trainer.train()
         trainer.save_model(str(artifact_path))
         tokenizer.save_pretrained(str(artifact_path))

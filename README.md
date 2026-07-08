@@ -64,6 +64,14 @@ Local full CodeBERT training is not recommended on low-memory GPUs. Use
 `notebooks/02_codebert_colab.ipynb` with a Colab GPU for the final CodeBERT
 measurements.
 
+If Colab is unreliable, local reduced CodeBERT runs are documented in
+`reports/local_codebert_runbook.md`:
+
+```bash
+.\.venv\Scripts\python.exe scripts\run_local_codebert.py synthetic
+.\.venv\Scripts\python.exe scripts\run_local_codebert.py codecontests-reduced
+```
+
 ## Dataset Format
 
 Training and evaluation datasets are CSV files with two columns:

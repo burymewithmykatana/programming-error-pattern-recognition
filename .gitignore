@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Project-generated artifacts
+.hf_cache/
 ~$*.pptx
 models/*.joblib
 reports/*_eval/
@@ -225,5 +226,6 @@ reports/predictions.csv
 reports/experiments/*/model.joblib
 reports/experiments/*/model/
 reports/experiments/*/predictions.csv
+reports/experiments/codebert_smoke/
 data/processed/*
 !data/processed/.gitkeep
