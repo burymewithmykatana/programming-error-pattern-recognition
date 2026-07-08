@@ -38,11 +38,31 @@ python scripts/prepare_code_contests.py --cache-dir D:\huggingface\code_contests
 python scripts/sanitize_splits.py --train data/processed/code_contests/train.csv --validation data/processed/code_contests/valid.csv --test data/processed/code_contests/test.csv --output-dir data/processed/code_contests
 ```
 
+Package the prepared CSV splits into the layout expected by the Colab notebook:
+
+```bash
+python scripts/package_colab_data.py --destination-root D:\error-pattern-data
+python scripts/package_colab_project.py --output D:\error-pattern-project.zip
+```
+
+Upload or sync both files to Google Drive:
+
+- `D:\error-pattern-data.zip` as `MyDrive/error-pattern-data.zip`
+- `D:\error-pattern-project.zip` as `MyDrive/error-pattern-project.zip`
+
+The project zip is useful when the local branch has not been pushed to GitHub.
+The Colab notebook writes trained CodeBERT models and metrics to
+`MyDrive/error-pattern-results`.
+
 Transformer training is optional and requires additional dependencies:
 
 ```bash
 pip install -e .[transformer]
 ```
+
+Local full CodeBERT training is not recommended on low-memory GPUs. Use
+`notebooks/02_codebert_colab.ipynb` with a Colab GPU for the final CodeBERT
+measurements.
 
 ## Dataset Format
 

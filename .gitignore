@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Project-generated artifacts
+~$*.pptx
 models/*.joblib
 reports/*_eval/
 reports/predictions.csv
