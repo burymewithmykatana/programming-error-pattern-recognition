@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>گزارش پروژه تشخیص الگوهای خطای برنامه‌نویسی</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --paper: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --amber: #b45309;
+      --soft-blue: #dbeafe;
+      --soft-teal: #ccfbf1;
+      --soft-amber: #fef3c7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Vazirmatn", "Segoe UI", Arial, sans-serif;
+      line-height: 1.9;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 24px 64px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #eff6ff, #ecfeff);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 24px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.45;
+      margin: 0 0 14px;
+    }
+
+    h1 {
+      font-size: 34px;
+      color: var(--ink);
+    }
+
+    h2 {
+      font-size: 24px;
+      border-bottom: 2px solid var(--soft-blue);
+      padding-bottom: 8px;
+      margin-top: 12px;
+    }
+
+    h3 {
+      font-size: 19px;
+      color: var(--teal);
+      margin-top: 22px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 18px 0;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      color: var(--blue);
+      direction: ltr;
+      text-align: right;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      overflow-wrap: anywhere;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: right;
+    }
+
+    th {
+      background: var(--blue);
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .note {
+      background: var(--soft-amber);
+      border-right: 5px solid var(--amber);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #78350f;
+    }
+
+    .success {
+      background: var(--soft-teal);
+      border-right: 5px solid var(--teal);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #134e4a;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding: 0 22px 0 0;
+      color: var(--muted);
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    figure {
+      margin: 18px 0 0;
+      padding: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+    }
+
+    figcaption {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .ltr {
+      direction: ltr;
+      unicode-bidi: isolate;
+      display: inline-block;
+    }
+
+    .submission {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 24px;
+      margin-top: 22px;
+      color: var(--ink);
+    }
+
+    .submission div {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .submission b {
+      color: var(--teal);
+      margin-left: 6px;
+    }
+
+    @media (max-width: 820px) {
+      main {
+        padding: 24px 12px 48px;
+      }
+
+      header,
+      .card {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .submission {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 13px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      main {
+        max-width: none;
+        padding: 0;
+      }
+
+      .card,
+      header {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>گزارش پروژه تشخیص الگوهای خطای برنامه‌نویسی در کدهای دانشجویی</h1>
+      <div class="submission">
+        <div><b>استاد:</b> جناب آقای دکتر عسگری مارنانی</div>
+        <div><b>دانشجو:</b> امیرمحمد قاسمی</div>
+        <div><b>کد دانشجویی:</b> 40411524</div>
+        <div><b>موضوع:</b> تشخیص الگوهای خطای برنامه‌نویسی با روش‌های یادگیری ماشین</div>
+      </div>
+      <div class="grid">
+        <div class="metric">
+          <strong>0.903</strong>
+          <span>Macro F1 مدل SVM روی داده مصنوعی هشت‌کلاسه</span>
+        </div>
+        <div class="metric">
+          <strong>0.458</strong>
+          <span>Macro F1 مدل CodeBERT کاهش‌یافته روی CodeContests</span>
+        </div>
+        <div class="metric">
+          <strong>90.5%</strong>
+          <span>دقت اصلاح گزارش‌شده BIFI روی خطاهای تجزیه پایتون</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>۱. هدف پروژه</h2>
+      <p>
+        هدف پروژه ساخت یک سامانه قابل تکرار برای تشخیص الگوهای رایج خطای برنامه‌نویسی در
+        کدهای پایتون است. ورودی سامانه یک قطعه کد یا فایل CSV شامل چند تحویل برنامه‌نویسی است و خروجی
+        یک برچسب خطا یا برچسب <span class="ltr">correct_solution</span> است.
+      </p>
+      <p>
+        از دید درس شناسایی الگو، پروژه شامل مراحل کامل مسئله است: تعریف کلاس‌ها،
+        آماده‌سازی داده، استخراج نمایش از کد، آموزش مدل، ارزیابی، تحلیل confusion matrix و
+        ساخت رابط نمایشی برای استفاده آموزشی.
+      </p>
+      <div class="success">
+        دستاورد اصلی پروژه این است که فقط یک مدل جداگانه ساخته نشده؛ بلکه یک زنجیره پردازش کامل
+        شامل بسته نرم‌افزاری، اسکریپت‌ها، آزمون‌ها، خروجی‌های آزمایش، گزارش، ارائه و داشبورد ساخته شده است.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>۲. سؤال‌های پژوهش</h2>
+      <ul>
+        <li>آیا نمایش متنی یا contextual کد می‌تواند الگوهای تکراری خطا را تشخیص دهد؟</li>
+        <li>آیا نتیجه‌ای که روی داده مصنوعی به دست می‌آید روی تحویل‌های واقعی هم قابل اعتماد است؟</li>
+        <li>وقتی آموزش کامل مدل مطلوب ممکن نیست، چه چیزی را می‌توان از یک مدل پژوهشی موفق یاد گرفت؟</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>۳. داده‌ها و برچسب‌ها</h2>
+      <h3>داده مصنوعی هشت‌کلاسه</h3>
+      <p>
+        مجموعه مصنوعی شامل ۹۷۶ نمونه یکتای پایتون است. این داده برای ساخت نمونه اولیه و بررسی
+        امکان یادگیری رده‌بندی خطا استفاده شد.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>برچسب</th>
+            <th>معنی</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="ltr">correct_solution</span></td><td>کد صحیح</td></tr>
+          <tr><td><span class="ltr">syntax_error</span></td><td>خطای نحوی یا خطای تجزیه</td></tr>
+          <tr><td><span class="ltr">variable_misuse</span></td><td>استفاده اشتباه از متغیر</td></tr>
+          <tr><td><span class="ltr">loop_logic_error</span></td><td>خطا در منطق حلقه</td></tr>
+          <tr><td><span class="ltr">conditional_logic_error</span></td><td>خطا در شرط‌ها</td></tr>
+          <tr><td><span class="ltr">function_definition_error</span></td><td>خطا در تعریف تابع</td></tr>
+          <tr><td><span class="ltr">data_structure_misuse</span></td><td>استفاده نادرست از ساختار داده</td></tr>
+          <tr><td><span class="ltr">algorithmic_inefficiency</span></td><td>ناکارآمدی الگوریتمی</td></tr>
+        </tbody>
+      </table>
+
+      <h3>داده واقعی CodeContests</h3>
+      <p>
+        برای اعتبارسنجی خارجی از تحویل‌های واقعی Python در DeepMind CodeContests استفاده شد.
+        این داده نوع دقیق خطای معنایی را مشخص نمی‌کند؛ بنابراین فقط دو برچسب علمی و قابل دفاع
+        ساخته شد: راه‌حل‌های پذیرفته‌شده به عنوان کد صحیح، و تحویل‌های نادرستی که با
+        AST پایتون قابل تجزیه نیستند به عنوان <span class="ltr">syntax_error</span>.
+      </p>
+      <div class="note">
+        تحویل‌های نادرستی که قابل تجزیه بودند عمداً حذف شدند، چون بدون برچسب‌گذاری تخصصی نمی‌توان آن‌ها را
+        به برچسب‌هایی مثل loop logic یا algorithmic inefficiency نسبت داد.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>۴. کنترل نشت داده و تکرارپذیری</h2>
+      <ul>
+        <li>کدها از نظر line ending و فاصله‌های ابتدا و انتها normalize شدند.</li>
+        <li>برای هر نمونه fingerprint با SHA-256 ساخته شد.</li>
+        <li>نمونه‌های تکراری در splitها حذف شدند.</li>
+        <li>اگر اثرانگشت مشترک بین داده آموزش و آزمون وجود داشته باشد، اجرای آزمایش رد می‌شود.</li>
+        <li>برای داده مصنوعی از تقسیم‌بندی ثابت و طبقه‌بندی‌شده استفاده شد.</li>
+        <li>برای CodeContests از تقسیم‌بندی رسمی مسئله‌ها استفاده شد تا نشت داده در سطح مسئله کمتر شود.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>۵. مدل‌ها</h2>
+      <h3>TF-IDF + Linear SVM</h3>
+      <p>
+        مدل پایه ابتدا کد را قطعه‌بندی و نرمال‌سازی می‌کند، سپس ویژگی‌های TF-IDF با unigram و
+        bigram می‌سازد و یک LinearSVC آموزش می‌دهد. مزیت این روش سرعت، سادگی و تکرارپذیری است.
+        محدودیت آن این است که اجرای واقعی برنامه یا معنای عمیق کد را مستقیماً درک نمی‌کند.
+      </p>
+
+      <h3>CodeBERT</h3>
+      <p>
+        مسیر یادگیری عمیق از <span class="ltr">microsoft/codebert-base</span> با یک سر طبقه‌بندی استفاده می‌کند.
+        تنظیمات شامل طول بیشینه ۲۵۶، اندازه دسته ۸، انباشت گرادیان، دقت آمیخته
+        هنگام وجود CUDA، توقف زودهنگام و seed ثابت است. چون آموزش کامل مجموعه‌داده مطلوب سنگین بود،
+        یک اجرای کاهش‌یافته روی CodeContests گزارش شد.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>۶. نتایج اندازه‌گیری‌شده</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>مدل</th>
+            <th>داده</th>
+            <th>کلاس‌ها</th>
+            <th>Train</th>
+            <th>Test</th>
+            <th>Accuracy</th>
+            <th>Macro F1</th>
+            <th>Weighted F1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SVM</td>
+            <td>داده مصنوعی</td>
+            <td>۸</td>
+            <td>۷۳۲</td>
+            <td>۲۴۴</td>
+            <td>0.8975</td>
+            <td>0.9031</td>
+            <td>0.9005</td>
+          </tr>
+          <tr>
+            <td>CodeBERT</td>
+            <td>داده مصنوعی</td>
+            <td>۸</td>
+            <td>۷۳۲</td>
+            <td>۲۴۴</td>
+            <td>0.5492</td>
+            <td>0.4390</td>
+            <td>0.4480</td>
+          </tr>
+          <tr>
+            <td>SVM</td>
+            <td>CodeContests</td>
+            <td>۲</td>
+            <td>۱۹,۹۹۹</td>
+            <td>۲,۰۵۹</td>
+            <td>0.7047</td>
+            <td>0.4404</td>
+            <td>0.8029</td>
+          </tr>
+          <tr>
+            <td>CodeBERT کاهش‌یافته</td>
+            <td>CodeContests</td>
+            <td>۲</td>
+            <td>۲,۰۰۰</td>
+            <td>۲,۰۵۹</td>
+            <td>0.6605</td>
+            <td>0.4583</td>
+            <td>0.7703</td>
+          </tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="figures/all_model_metrics.png" alt="نمودار مقایسه Accuracy و Macro F1 مدل‌ها">
+        <figcaption>مقایسه Accuracy و Macro F1 برای چهار اجرای اصلی.</figcaption>
+      </figure>
+    </section>
+
+    <section class="card">
+      <h2>۷. تفسیر نتایج واقعی</h2>
+      <p>
+        در آزمون واقعی CodeContests، توزیع کلاس‌ها بسیار نامتوازن است: ۲,۰۰۰ نمونه صحیح و فقط
+        ۵۹ نمونه خطای نحوی وجود دارد. به همین دلیل دقت کلی به‌تنهایی گمراه‌کننده است و Macro F1
+        معیار مهم‌تری محسوب می‌شود.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>مدل</th>
+            <th>تشخیص syntax error</th>
+            <th>Precision خطای syntax</th>
+            <th>Recall خطای syntax</th>
+            <th>برداشت اصلی</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SVM</td>
+            <td>۱۸ از ۵۹</td>
+            <td>0.03</td>
+            <td>0.31</td>
+            <td>محافظه‌کارتر است، اما بیشتر خطاهای syntax را از دست می‌دهد.</td>
+          </tr>
+          <tr>
+            <td>CodeBERT کاهش‌یافته</td>
+            <td>۵۱ از ۵۹</td>
+            <td>0.07</td>
+            <td>0.86</td>
+            <td>Recall بالاتری دارد، اما ۶۹۱ کد correct را اشتباهاً syntax error می‌زند.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        نتیجه مهم این است که CodeBERT برای اولویت‌بندی بازبینی با یادآوری بالا مفیدتر است، اما به دلیل دقت مثبت پایین
+        نباید تصمیم نهایی و خودکار درباره خطادار بودن کد بگیرد.
+      </div>
+      <figure>
+        <img src="figures/codecontests_codebert_reduced_confusion.png" alt="ماتریس درهم‌ریختگی CodeBERT کاهش‌یافته روی CodeContests">
+        <figcaption>ماتریس درهم‌ریختگی CodeBERT کاهش‌یافته روی داده واقعی.</figcaption>
+      </figure>
+    </section>
+
+    <section class="card">
+      <h2>۸. مطالعه مدل موفق: BIFI</h2>
+      <p>
+        چون آموزش کامل مدل مطلوب روی مجموعه‌داده بزرگ به طور کامل ممکن نشد، پروژه یک مطالعه مقایسه‌ای
+        روی مدل موفق <span class="ltr">Break-It-Fix-It</span> یا BIFI اضافه می‌کند. BIFI توسط
+        Yasunaga و Liang ارائه شده و هدف آن طبقه‌بندی نیست؛ بلکه اصلاح برنامه است.
+      </p>
+      <p>
+        BIFI از یک داور مانند تجزیه‌گر یا کامپایلر استفاده می‌کند تا تشخیص دهد خروجی مدل واقعاً معتبر
+        شده است یا نه. این مدل ابتدا از خطاهای مصنوعی شروع می‌کند، سپس با استفاده از داور خروجی‌های
+        موفق را نگه می‌دارد و یک breaker یاد می‌گیرد که خطاهای واقع‌گرایانه‌تری تولید کند.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>ویژگی</th>
+            <th>این پروژه</th>
+            <th>BIFI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>نوع مسئله</td>
+            <td>طبقه‌بندی الگوی خطا</td>
+            <td>اصلاح کد خطادار</td>
+          </tr>
+          <tr>
+            <td>سیگنال آموزشی</td>
+            <td>برچسب‌های مصنوعی و بررسی AST</td>
+            <td>داور مبتنی بر تجزیه‌گر یا کامپایلر و داده‌های شبه‌جفت</td>
+          </tr>
+          <tr>
+            <td>نتیجه شاخص</td>
+            <td>Macro F1 برابر 0.903 روی داده مصنوعی و 0.458 روی CodeContests با CodeBERT کاهش‌یافته</td>
+            <td>دقت اصلاح 90.5% روی GitHub-Python و 71.7% روی DeepFix</td>
+          </tr>
+          <tr>
+            <td>مزیت</td>
+            <td>زنجیره پردازش کامل و داشبورد آموزشی</td>
+            <td>سازگاری بهتر با توزیع خطاهای واقعی</td>
+          </tr>
+          <tr>
+            <td>نیازمندی</td>
+            <td>برچسب معتبر و تعادل بهتر کلاس‌ها</td>
+            <td>داده بزرگ، توان پردازشی بیشتر، داور قابل اعتماد و معماری اصلاح برنامه</td>
+          </tr>
+          <tr>
+            <td>محدودیت</td>
+            <td>precision پایین روی syntax error واقعی</td>
+            <td>برای خطاهای معنایی به آزمون یا بازخورد قوی‌تر نیاز دارد</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        منبع: <a href="https://arxiv.org/abs/2106.06600">Break-It-Fix-It: Unsupervised Learning for Program Repair</a>.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>۹. دستاوردهای پروژه</h2>
+      <ul>
+        <li>ساخت بسته نرم‌افزاری قابل توسعه برای تشخیص الگوهای خطای برنامه‌نویسی.</li>
+        <li>پیاده‌سازی مدل پایه کلاسیک و مسیر یادگیری عمیق با CodeBERT.</li>
+        <li>ثبت خروجی‌های کامل شامل پیکربندی، معیارها، گزارش طبقه‌بندی و ماتریس درهم‌ریختگی.</li>
+        <li>کنترل نشت داده با اثرانگشت و بررسی همپوشانی بین داده آموزش و آزمون.</li>
+        <li>اعتبارسنجی روی داده واقعی، نه فقط داده مصنوعی.</li>
+        <li>ساخت داشبورد برای ورود کد، مثال‌های آماده، بارگذاری CSV و نمایش پیش‌بینی.</li>
+        <li>افزودن مقایسه پژوهشی با BIFI برای توضیح مسیر علمی آینده.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>۱۰. محدودیت‌ها</h2>
+      <ul>
+        <li>داده مصنوعی برای اثبات امکان یادگیری مفید است، اما تعمیم‌پذیری کلاسی را ثابت نمی‌کند.</li>
+        <li>CodeContests داده واقعی است، اما دقیقاً داده کلاس‌های آموزشی مقدماتی نیست.</li>
+        <li>برچسب‌های معنایی واقعی مثل loop logic و algorithmic inefficiency در CodeContests وجود ندارد.</li>
+        <li>مسئله فعلی تک‌برچسبی است، در حالی که یک کد واقعی می‌تواند چند خطا داشته باشد.</li>
+        <li>نامتوازن بودن آزمون واقعی باعث می‌شود دقت کلی معیار کافی نباشد.</li>
+        <li>برای مدل قابل استفاده در محیط واقعی باید داده دانشجویی ناشناس، برچسب‌گذاری تخصصی یا بازخورد مبتنی بر آزمون واحد اضافه شود.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>۱۱. جمع‌بندی</h2>
+      <p>
+        پروژه یک روند کاری کامل برای تشخیص الگوهای خطای برنامه‌نویسی ارائه می‌کند. نتیجه داده مصنوعی نشان
+        می‌دهد که زنجیره پردازش می‌تواند رده‌بندی پیشنهادی را یاد بگیرد. نتیجه واقعی نشان می‌دهد که مسئله در
+        داده واقعی بسیار سخت‌تر است و دقت کلی به‌تنهایی قابل اتکا نیست.
+      </p>
+      <p>
+        مطالعه BIFI نشان می‌دهد مسیر بعدی باید از برچسب ایستا فراتر برود و از تجزیه‌گر، کامپایلر یا آزمون واحد
+        به عنوان بازخورد قابل اعتماد استفاده کند. بنابراین دستاورد پروژه فقط عدد نهایی نیست؛ بلکه مشخص
+        کردن مرز ادعاها و مسیر علمی بعدی نیز هست.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

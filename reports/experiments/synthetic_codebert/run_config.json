@@ -1,0 +1,57 @@
+{
+  "model_type": "codebert",
+  "train_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\synthetic\\train.csv",
+  "test_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\synthetic\\test.csv",
+  "model_path": "C:\\Users\\S.R.G\\Documents\\PR project\\reports\\experiments\\synthetic_codebert\\model",
+  "labels": [
+    "algorithmic_inefficiency",
+    "conditional_logic_error",
+    "correct_solution",
+    "data_structure_misuse",
+    "function_definition_error",
+    "loop_logic_error",
+    "syntax_error",
+    "variable_misuse"
+  ],
+  "config": {
+    "random_seed": 42,
+    "model": {
+      "name": "microsoft/codebert-base",
+      "max_length": 128,
+      "num_labels": 8
+    },
+    "training": {
+      "epochs": 1,
+      "batch_size": 2,
+      "learning_rate": 2e-05,
+      "gradient_accumulation_steps": 8,
+      "validation_size": 0.1,
+      "early_stopping_patience": 1,
+      "mixed_precision": false
+    },
+    "notes": "CPU-safe local CodeBERT config. Use for synthetic full and reduced CodeContests runs."
+  },
+  "python": "3.14.3",
+  "dataset_stats": {
+    "train_labels": {
+      "algorithmic_inefficiency": 94,
+      "loop_logic_error": 94,
+      "function_definition_error": 94,
+      "correct_solution": 94,
+      "conditional_logic_error": 94,
+      "data_structure_misuse": 93,
+      "variable_misuse": 93,
+      "syntax_error": 76
+    },
+    "test_labels": {
+      "data_structure_misuse": 32,
+      "variable_misuse": 32,
+      "algorithmic_inefficiency": 31,
+      "conditional_logic_error": 31,
+      "function_definition_error": 31,
+      "loop_logic_error": 31,
+      "correct_solution": 31,
+      "syntax_error": 25
+    }
+  }
+}

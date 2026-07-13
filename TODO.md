@@ -10,5 +10,6 @@
 8. Done: Add CLI-level tests for training, prediction, and evaluation scripts.
 9. Stage and commit the current project changes when ready.
 10. Done: Implement a UI dashboard for instructors to upload submissions, run predictions, and inspect error-pattern reports.
-11. In progress: Package Colab-ready CSV data, run both CodeBERT experiments in Google Colab, and copy their measured artifacts back.
-12. Insert measured CodeBERT metrics into the final report and regenerate the presentation.
+11. Done: Package Colab-ready CSV data, run both CodeBERT experiments in Google Colab, and copy their measured artifacts back.
+12. Done: Insert measured CodeBERT metrics into the final report and regenerate the presentation.
+13. Done: Add BIFI as a successful external research case study for comparison and future direction.

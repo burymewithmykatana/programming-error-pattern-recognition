@@ -1,0 +1,9 @@
+,correct_solution,syntax_error,variable_misuse,loop_logic_error,conditional_logic_error,function_definition_error,data_structure_misuse,algorithmic_inefficiency
+correct_solution,0,0,0,0,9,0,13,9
+syntax_error,0,0,0,0,0,6,19,0
+variable_misuse,0,0,0,0,0,0,18,14
+loop_logic_error,0,0,0,30,0,0,0,1
+conditional_logic_error,0,0,0,0,31,0,0,0
+function_definition_error,0,0,0,0,0,15,16,0
+data_structure_misuse,0,0,0,5,0,0,27,0
+algorithmic_inefficiency,0,0,0,0,0,0,0,31

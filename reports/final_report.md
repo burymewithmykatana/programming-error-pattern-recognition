@@ -41,22 +41,54 @@ trains a `LinearSVC`.
 The project includes a Hugging Face training path and a Colab notebook for
 `microsoft/codebert-base`. It uses a maximum length of 256, batch size 8, gradient
 accumulation, mixed precision when CUDA is available, early stopping, and seed 42.
-CodeBERT metrics are not claimed until the Colab experiments have completed.
+The full CodeContests training target could not be completed locally, so the project reports
+a reduced CodeBERT validation run with 2,000 training rows and the same 2,059-row official
+test split.
 
-## Measured SVM Results
+## Measured Results
 
-| Dataset | Classes | Train | Test | Accuracy | Macro F1 | Weighted F1 |
-|---|---:|---:|---:|---:|---:|---:|
-| Synthetic prototype | 8 | 732 | 244 | 0.8975 | 0.9031 | 0.9005 |
-| CodeContests external validation | 2 | 19,999 | 2,059 | 0.7047 | 0.4404 | 0.8029 |
+| Model | Dataset | Classes | Train | Test | Accuracy | Macro F1 | Weighted F1 |
+|---|---|---:|---:|---:|---:|---:|---:|
+| TF-IDF + Linear SVM | Synthetic prototype | 8 | 732 | 244 | 0.8975 | 0.9031 | 0.9005 |
+| CodeBERT | Synthetic prototype | 8 | 732 | 244 | 0.5492 | 0.4390 | 0.4480 |
+| TF-IDF + Linear SVM | CodeContests external validation | 2 | 19,999 | 2,059 | 0.7047 | 0.4404 | 0.8029 |
+| CodeBERT reduced | CodeContests external validation | 2 | 2,000 | 2,059 | 0.6605 | 0.4583 | 0.7703 |
 
 The synthetic experiment performs strongly on categories with visually distinct templates.
 Most errors occur between correct code, variable misuse, and loop-logic mistakes.
 
 The CodeContests test split is naturally imbalanced: 2,000 correct submissions and 59 syntax
-errors. The model correctly identifies 1,433 correct submissions and 18 syntax errors. Its
+errors. The SVM correctly identifies 1,433 correct submissions and 18 syntax errors. Its
 syntax-error precision is 0.03 and recall is 0.31, so the 0.70 accuracy must not be interpreted
-as strong minority-class performance. Macro F1 is the more informative summary.
+as strong minority-class performance.
+
+The reduced CodeBERT run identifies 51 of 59 syntax errors, giving much higher syntax-error
+recall. However, it also marks 691 correct submissions as syntax errors, so syntax-error
+precision remains low at 0.07. This makes CodeBERT more useful as a high-recall triage signal
+than as a final automatic judgment. Macro F1 remains the most informative summary because it
+penalizes this minority-class precision problem.
+
+## Successful External Model Study: BIFI
+
+Because the intended full-scale CodeBERT training could not be completed, the project also
+studies a successful related model: Break-It-Fix-It (BIFI) by Yasunaga and Liang. BIFI targets
+program repair rather than classification. Given a parser or compiler-style critic, it learns
+to convert broken code into valid code. On GitHub-Python, where the target is repairing Python
+AST parse errors, BIFI reports 90.5% repair accuracy. On DeepFix C student programs, it reports
+71.7% repair accuracy.
+
+BIFI is relevant to this project because it addresses the same data problem exposed by the
+CodeContests experiment: synthetic errors often do not match the distribution of real human
+errors. BIFI begins with synthetic corrupted code, but then uses a critic to verify successful
+fixes and to train a "breaker" that generates more realistic bad examples. This iterative
+process adapts the model toward real error distributions.
+
+Compared with this project, BIFI requires more data, more compute, a repair architecture, and
+a reliable critic such as a parser or compiler. Its advantage is that it moves beyond labeling:
+it can produce corrected code for parser-detectable errors. Its limitation is that parser or
+compiler feedback does not automatically cover semantic errors such as wrong loop logic,
+wrong conditions, or algorithmic inefficiency. For those categories, a successful future model
+would need expert annotations, unit-test feedback, or another behavioral signal.
 
 ## Reproduction
 

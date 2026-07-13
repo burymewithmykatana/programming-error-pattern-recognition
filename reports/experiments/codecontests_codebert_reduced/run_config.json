@@ -1,0 +1,39 @@
+{
+  "model_type": "codebert",
+  "train_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\code_contests_local\\train_1000_per_label.csv",
+  "test_data": "C:\\Users\\S.R.G\\Documents\\PR project\\data\\processed\\code_contests\\test.csv",
+  "model_path": "C:\\Users\\S.R.G\\Documents\\PR project\\reports\\experiments\\codecontests_codebert_reduced\\model",
+  "labels": [
+    "correct_solution",
+    "syntax_error"
+  ],
+  "config": {
+    "random_seed": 42,
+    "model": {
+      "name": "microsoft/codebert-base",
+      "max_length": 128,
+      "num_labels": 8
+    },
+    "training": {
+      "epochs": 1,
+      "batch_size": 2,
+      "learning_rate": 2e-05,
+      "gradient_accumulation_steps": 8,
+      "validation_size": 0.1,
+      "early_stopping_patience": 1,
+      "mixed_precision": false
+    },
+    "notes": "CPU-safe local CodeBERT config. Use for synthetic full and reduced CodeContests runs."
+  },
+  "python": "3.14.3",
+  "dataset_stats": {
+    "train_labels": {
+      "syntax_error": 1000,
+      "correct_solution": 1000
+    },
+    "test_labels": {
+      "correct_solution": 2000,
+      "syntax_error": 59
+    }
+  }
+}

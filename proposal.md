@@ -40,7 +40,13 @@ The primary baseline uses TF-IDF vectorization over tokenized code and a linear 
 
 ## Deep Learning Approach
 
-The project includes placeholders for a future transformer classifier. The intended future model is based on `microsoft/codebert-base`, using a tokenizer, sequence classification head, and Hugging Face Trainer. Transformer dependencies are not required for the baseline MVP.
+The project includes a transformer classifier based on `microsoft/codebert-base`, using a tokenizer, sequence classification head, and Hugging Face Trainer. The full target dataset is expensive to train on limited local resources, so the project reports a reduced CodeBERT run and compares it with the classical baseline.
+
+## Related Successful Model: BIFI
+
+To place the project results beside a successful research system, the plan includes Break-It-Fix-It (BIFI) by Yasunaga and Liang. BIFI is not a classifier; it is a program-repair method that learns to convert broken code into valid code using parser or compiler feedback as a critic. It reports strong repair accuracy on Python AST parse errors and DeepFix C compilation errors.
+
+BIFI is useful for this project because it shows what a successful real-world error model needs: large unlabeled code corpora, a reliable critic, iterative adaptation from synthetic to realistic errors, and enough compute for transformer-style training. Its limitation is that parser/compiler feedback mainly supports syntax and compilation failures; semantic categories such as wrong loop logic still require expert labels or test-case feedback.
 
 ## Evaluation Metrics
 
@@ -52,9 +58,8 @@ The baseline is expected to provide a measurable starting point on synthetic and
 
 ## Future MVP Direction
 
-Future work should include real student submissions, task-specific context, hidden test outcomes, multi-label classification, and instructor-facing feedback tools.
+Future work should include real student submissions, task-specific context, hidden test outcomes, multi-label classification, instructor-facing feedback tools, and a BIFI-inspired training path that uses parser or unit-test feedback to reduce the gap between generated labels and real student mistakes.
 
 ## Conclusion
 
 This project provides a practical and extensible foundation for recognizing programming error patterns in student submissions. It connects classical pattern recognition methods with modern deep learning approaches for source-code understanding.
-
