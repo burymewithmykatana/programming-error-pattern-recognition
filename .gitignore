@@ -12,6 +12,7 @@ build/
 develop-eggs/
 dist/
 downloads/
+Downloads/
 eggs/
 .eggs/
 lib/
@@ -49,6 +50,7 @@ coverage.xml
 *.py.cover
 .hypothesis/
 .pytest_cache/
+.pytest-*/
 cover/
 
 # Translations
@@ -229,3 +231,7 @@ reports/experiments/*/predictions.csv
 reports/experiments/codebert_smoke/
 data/processed/*
 !data/processed/.gitkeep
+reports/research_start/*/predictions.csv
+reports/research_start/*/model.joblib
+reports/research_start/offline_transformer_smoke/
+reports/research_start/recreated_sample.csv

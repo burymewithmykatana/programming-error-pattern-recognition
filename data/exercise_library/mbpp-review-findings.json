@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "library_sha256": "ca95deaa9a01ef0a6f439f88bcf0dd3db3563d22f22aad6cae04ebb9a8d8c8e9",
+  "purpose": "Known defects only; absence from this list is not approval.",
+  "excluded": [
+    {
+      "task_id": 603,
+      "reason": "The statement says lucid numbers, while the reference implements ludic numbers; the intended exercise needs clarification.",
+      "evidence": "reports/research_start/CONTAINER_PILOT.md"
+    },
+    {
+      "task_id": 605,
+      "reason": "The prime-number reference returns None for 2 and True for 9, despite passing its supplied assertions.",
+      "evidence": "reports/research_start/mbpp_605_counterexamples.json"
+    }
+  ]
+}

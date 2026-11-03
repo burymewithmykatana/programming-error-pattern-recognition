@@ -1,0 +1,10 @@
+{
+  "exercise_id": "add-two-integers",
+  "prompt": "Write add(a, b), returning the sum of two integers.",
+  "function_name": "add",
+  "tests": [
+    {"test_id": "positive", "input": [2, 3], "expected": 5, "points": 2},
+    {"test_id": "negative", "input": [-4, 1], "expected": -3, "points": 3},
+    {"test_id": "zero", "input": [0, 0], "expected": 0, "points": 1}
+  ]
+}
