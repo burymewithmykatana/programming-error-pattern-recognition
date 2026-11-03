@@ -1,0 +1,48 @@
+{
+  "exercise_id": "mbpp-602",
+  "split": "train",
+  "research_only": true,
+  "teacher_approved": false,
+  "runner_image_id": "sha256:da444b90434d0aaeb3420cfcc1fda68c5672e14d69a548d218c0c81834aba288",
+  "reference_job_sha256": "05fbcbdf79aff2d91e9ccb82dcbd4bac2f1b4c4b3af68824e845765e19ce8ff4",
+  "reference_outcomes": [
+    {
+      "test_id": "mbpp-602-1",
+      "status": "passed",
+      "actual": "a"
+    },
+    {
+      "test_id": "mbpp-602-2",
+      "status": "passed",
+      "actual": null
+    },
+    {
+      "test_id": "mbpp-602-3",
+      "status": "passed",
+      "actual": "1"
+    }
+  ],
+  "reference_passed": true,
+  "candidate_job_sha256": "e42376800ea8d1c05cd7802f6c0f9e7af90f97251e7a8998dfd98f3e99498132",
+  "candidate_id": "mbpp-602-mutant-1",
+  "candidate_outcomes": [
+    {
+      "test_id": "mbpp-602-1",
+      "status": "passed",
+      "actual": "a"
+    },
+    {
+      "test_id": "mbpp-602-2",
+      "status": "failed",
+      "actual": "a"
+    },
+    {
+      "test_id": "mbpp-602-3",
+      "status": "passed",
+      "actual": "1"
+    }
+  ],
+  "provisional_passed_tests": 2,
+  "total_tests": 3,
+  "limitations": "Synthetic test-derived evidence only; not teacher grades or classroom-ready execution."
+}

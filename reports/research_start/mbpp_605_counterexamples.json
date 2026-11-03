@@ -1,0 +1,25 @@
+{
+  "exercise_id": "mbpp-605",
+  "research_only": true,
+  "source_job_sha256": "7a504271ec220b5c04337e5d4b1db2cd236ab7b193dc6c020ff3420869a26fdd",
+  "runner_image_id": "sha256:da444b90434d0aaeb3420cfcc1fda68c5672e14d69a548d218c0c81834aba288",
+  "note": "Manually selected counterexamples, not source assertions or teacher-approved grading tests.",
+  "counterexamples": [
+    {
+      "input": 2,
+      "expected": true,
+      "result": {
+        "status": "failed",
+        "actual": null
+      }
+    },
+    {
+      "input": 9,
+      "expected": false,
+      "result": {
+        "status": "failed",
+        "actual": true
+      }
+    }
+  ]
+}

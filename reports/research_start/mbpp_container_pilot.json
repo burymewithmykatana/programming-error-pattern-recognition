@@ -1,0 +1,48 @@
+{
+  "exercise_id": "mbpp-606",
+  "split": "train",
+  "research_only": true,
+  "teacher_approved": false,
+  "runner_image_id": "sha256:da444b90434d0aaeb3420cfcc1fda68c5672e14d69a548d218c0c81834aba288",
+  "reference_job_sha256": "d63ef7975bebd2cd0c2f099dfa34dc9ab86e8c586c44e5dc28de05da303675d6",
+  "reference_outcomes": [
+    {
+      "test_id": "mbpp-606-1",
+      "status": "passed",
+      "actual": 1.5707963267948966
+    },
+    {
+      "test_id": "mbpp-606-2",
+      "status": "passed",
+      "actual": 1.0471975511965976
+    },
+    {
+      "test_id": "mbpp-606-3",
+      "status": "passed",
+      "actual": 2.0943951023931953
+    }
+  ],
+  "reference_passed": true,
+  "candidate_job_sha256": "1892c1e9b3a89d02795d8d1bd5437ff8b4d3015dcf4f1a9c5bd159bd5de190ca",
+  "candidate_id": "mbpp-606-mutant-1",
+  "candidate_outcomes": [
+    {
+      "test_id": "mbpp-606-1",
+      "status": "failed",
+      "actual": 90.01745329251995
+    },
+    {
+      "test_id": "mbpp-606-2",
+      "status": "failed",
+      "actual": 60.017453292519946
+    },
+    {
+      "test_id": "mbpp-606-3",
+      "status": "failed",
+      "actual": 120.01745329251995
+    }
+  ],
+  "provisional_passed_tests": 0,
+  "total_tests": 3,
+  "limitations": "Synthetic test-derived evidence only; not teacher grades or classroom-ready execution."
+}

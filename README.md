@@ -2,9 +2,23 @@
 
 This repository contains a modular Pattern Recognition course project for classifying student programming submissions into common programming error categories. The project targets Python code and provides a classical TF-IDF/SVM baseline, CodeBERT training and inference, leakage-safe experiments, and a Streamlit demonstration dashboard.
 
+**Current direction:** build a teaching assistant that suggests scores for Python
+function submissions using exercise-specific rubrics and test evidence, with
+teacher review. See [TEACHING_ASSISTANT_PLAN.md](TEACHING_ASSISTANT_PLAN.md).
+The existing classifier and dashboard are historical research components; they
+do not grade exercises. The review app accepts recorded test outcomes, including a controlled Docker
+pilot. See [the reproducible demo](TEACHING_ASSISTANT_DEMO.md) for setup,
+exercise selection, evidence export, and current limitations. Synthetic grading examples and
+their limitations are described in `data/synthetic_grading/README.md`.
+
 ## Research Motivation
 
 Introductory programming courses produce many submissions with recurring error patterns. Automatically recognizing these patterns can help instructors triage feedback, identify misconceptions, and build adaptive tutoring tools. This project treats programming error recognition as a supervised multi-class pattern recognition problem over source code.
+
+The current real-data experiment is narrower: it compares accepted CodeContests
+solutions with incorrect submissions that fail Python parsing. It does not measure
+real-world multi-class semantic error recognition. See [RESEARCH_PLAN.md](RESEARCH_PLAN.md)
+for the study protocol, current limitations, and diagnostic baseline commands.
 
 ## Problem Formulation
 
@@ -60,9 +74,8 @@ Transformer training is optional and requires additional dependencies:
 pip install -e .[transformer]
 ```
 
-Local full CodeBERT training is not recommended on low-memory GPUs. Use
-`notebooks/02_codebert_colab.ipynb` with a Colab GPU for the final CodeBERT
-measurements.
+Local full CodeBERT training can be demanding on low-memory GPUs. The Colab
+notebook provides an alternative GPU workflow.
 
 If Colab is unreliable, local reduced CodeBERT runs are documented in
 `reports/local_codebert_runbook.md`:
@@ -97,8 +110,24 @@ Run an explicit leakage-safe train/test experiment:
 python scripts/run_experiment.py --train-data data/processed/synthetic/train.csv --test-data data/processed/synthetic/test.csv --model-type svm --config configs/baseline.yaml --output reports/experiments/synthetic_svm
 ```
 
+To train the transformer directly (with optional dependencies installed):
+
+```bash
+python scripts/train_transformer.py --data data/processed/synthetic/train.csv --config configs/deep_model.yaml --output models/codebert
+```
+
 The experiment directory contains metrics, a classification report, a confusion matrix,
 predictions, run metadata, timings, dataset statistics, and the trained artifact.
+
+The recovered experiment reports record synthetic and reduced CodeContests
+CodeBERT runs. The latter used a 2,000-row training input and the unchanged test
+split; it is not a full-data run. Historical metrics and configurations are in
+`reports/experiments/`, but the matching reduced-run checkpoint, predictions,
+dataset hashes and model revision are unavailable, so the runs have not yet
+been reproduced. A separate three-epoch CodeBERT checkpoint was found in the
+Colab results folder on Google Drive; it is not the reduced-run checkpoint. The
+historical CodeContests data mixed Python 2 and 3; see the research plan for the
+effect on label validity.
 
 ## Evaluation
 
@@ -154,12 +183,32 @@ The system follows a standard pattern recognition pipeline: input representation
 ## Future Work
 
 - Add larger real-world datasets from course submissions.
-- Complete and report the two Colab CodeBERT runs.
+- Repeat and preserve CodeBERT experiment outputs, including a full-data run.
 - Add task-aware evaluation using hidden unit tests.
 - Support multi-label classification when submissions contain multiple errors.
 - Extend the dashboard with instructor feedback generation.
 
 ## Dashboard and presentation
+
+Run the teaching-assistant review demo with its synthetic submissions:
+
+```bash
+pip install -e .[presentation]
+streamlit run grading_app.py
+```
+
+The demo displays pre-recorded outcomes, recalculates suggested scores, and lets
+the teacher prepare and download a review. It also includes a searchable,
+teacher-only preview of 427 sanitized MBPP exercises; see
+`data/exercise_library/README.md` for attribution and limitations. MBPP tests
+are displayed as text; simple literal assertions can be exported as unapproved
+drafts, but they are not yet connected to grading. The app does not
+yet call an LLM, run student submissions, or provide a secure execution service.
+An isolated-container **research prototype** has been exercised on controlled synthetic
+MBPP examples; it is not security-reviewed or suitable for real student code. See
+`reports/research_start/CONTAINER_PILOT.md`.
+
+The original classifier dashboard and presentation can be run with:
 
 ```bash
 pip install -e .[presentation]
@@ -167,5 +216,6 @@ streamlit run app.py
 python scripts/generate_presentation.py
 ```
 
-Presentation deliverables are under `presentation/`. Run
-`notebooks/02_codebert_colab.ipynb` on a Colab GPU to produce the two CodeBERT experiments.
+The presentation generator uses the recovered historical metrics under
+`reports/experiments/`. Review the research plan and limitations before presenting
+those results as research evidence.

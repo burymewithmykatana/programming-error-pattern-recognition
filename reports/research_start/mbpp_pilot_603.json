@@ -1,0 +1,163 @@
+{
+  "exercise_id": "mbpp-603",
+  "split": "train",
+  "research_only": true,
+  "teacher_approved": false,
+  "runner_image_id": "sha256:da444b90434d0aaeb3420cfcc1fda68c5672e14d69a548d218c0c81834aba288",
+  "reference_job_sha256": "14d53eebfce07f23fca7cda78188c2654788e02b84c712fa567e00351a09160d",
+  "reference_outcomes": [
+    {
+      "test_id": "mbpp-603-1",
+      "status": "passed",
+      "actual": [
+        1,
+        2,
+        3,
+        5,
+        7
+      ]
+    },
+    {
+      "test_id": "mbpp-603-2",
+      "status": "passed",
+      "actual": [
+        1,
+        2,
+        3,
+        5,
+        7,
+        11,
+        13,
+        17,
+        23,
+        25
+      ]
+    },
+    {
+      "test_id": "mbpp-603-3",
+      "status": "passed",
+      "actual": [
+        1,
+        2,
+        3,
+        5,
+        7,
+        11,
+        13,
+        17,
+        23,
+        25,
+        29,
+        37,
+        41,
+        43
+      ]
+    }
+  ],
+  "reference_passed": true,
+  "candidate_job_sha256": "04106db75f8d67caf694476ddccf98a5c795eb7222ca0524dfc86cbc464215de",
+  "candidate_id": "mbpp-603-mutant-1",
+  "candidate_outcomes": [
+    {
+      "test_id": "mbpp-603-1",
+      "status": "failed",
+      "actual": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "test_id": "mbpp-603-2",
+      "status": "failed",
+      "actual": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ]
+    },
+    {
+      "test_id": "mbpp-603-3",
+      "status": "failed",
+      "actual": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ]
+    }
+  ],
+  "provisional_passed_tests": 0,
+  "total_tests": 3,
+  "limitations": "Synthetic test-derived evidence only; not teacher grades or classroom-ready execution."
+}
